@@ -2,18 +2,21 @@ import domEvents from './dom-events-to-record'
 import pptrActions from './pptr-actions'
 import Block from './Block'
 
-const importPuppeteer = `const puppeteer = require('puppeteer');\n`
+const importPuppeteer = `const playwright = require('playwright');\n`
 
-const header = `const browser = await puppeteer.launch()
-const page = await browser.newPage()`
+// TODO: for firefox and webkit
+const header = `const browser = await playwright['chromium'].launch(); 
+const context = await browser.newContext();
+const page = await context.newPage();`
 
-const footer = `await browser.close()`
+const footer = `await browser.close();`
 
 const wrappedHeader = `(async () => {
-  const browser = await puppeteer.launch()
-  const page = await browser.newPage()\n`
+  const browser = await playwright['chromium'].launch();
+  const context = await browser.newContext();
+  const page = await context.newPage();\n`
 
-const wrappedFooter = `  await browser.close()
+const wrappedFooter = `  await browser.close();
 })()`
 
 export const defaults = {

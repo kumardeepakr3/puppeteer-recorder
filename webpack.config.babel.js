@@ -112,8 +112,4 @@ const production = {
   ]
 }
 
-if (NODE_ENV === 'development') {
-  module.exports = development
-} else {
-  module.exports = production
-}
+module.exports = development
