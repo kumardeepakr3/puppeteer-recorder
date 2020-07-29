@@ -2,18 +2,20 @@ import domEvents from './dom-events-to-record'
 import pptrActions from './pptr-actions'
 import Block from './Block'
 
-const importPuppeteer = `const puppeteer = require('puppeteer');\n`
+const importPlaywright = `const playwright = require('playwright');\n`
 
-const header = `const browser = await puppeteer.launch()
-const page = await browser.newPage()`
+const header = `const browser = await playwright['chromium'].launch();
+const context = await browser.newContext();
+const page = await context.newPage();`
 
-const footer = `await browser.close()`
+const footer = `await browser.close();`
 
 const wrappedHeader = `(async () => {
-  const browser = await puppeteer.launch()
-  const page = await browser.newPage()\n`
+  const browser = await playwright['chromium'].launch();
+  const context = await browser.newContext();
+  const page = await context.newPage();\n`
 
-const wrappedFooter = `  await browser.close()
+const wrappedFooter = `  await browser.close();
 })()`
 
 export const defaults = {
@@ -38,7 +40,7 @@ export default class CodeGenerator {
   }
 
   generate (events) {
-    return importPuppeteer + this._getHeader() + this._parseEvents(events) + this._getFooter()
+    return importPlaywright + this._getHeader() + this._parseEvents(events) + this._getFooter()
   }
 
   _getHeader () {
@@ -153,14 +155,14 @@ export default class CodeGenerator {
     return block
   }
   _handleChange (selector, value) {
-    return new Block(this._frameId, { type: domEvents.CHANGE, value: `await ${this._frame}.select('${selector}', '${value}')` })
+    return new Block(this._frameId, { type: domEvents.CHANGE, value: `await ${this._frame}.selectOption('${selector}', '${value}')` })
   }
   _handleGoto (href) {
     return new Block(this._frameId, { type: pptrActions.GOTO, value: `await ${this._frame}.goto('${href}')` })
   }
 
   _handleViewport (width, height) {
-    return new Block(this._frameId, { type: pptrActions.VIEWPORT, value: `await ${this._frame}.setViewport({ width: ${width}, height: ${height} })` })
+    return new Block(this._frameId, { type: pptrActions.VIEWPORT, value: `await ${this._frame}.setViewportSize({ width: ${width}, height: ${height} })` })
   }
 
   _handleScreenshot (options) {
@@ -176,7 +178,7 @@ export default class CodeGenerator {
 
       block = new Block(this._frameId, {
         type: pptrActions.SCREENSHOT,
-        value: `await ${this._frame}.screenshot({ path: 'screenshot_${this._screenshotCounter}.png', clip: { x: ${options.x}, y: ${options.y}, width: ${options.width}, height: ${options.height} } })` })
+        value: `await ${this._frame}.screenshot({ path: 'screenshot_${this._screenshotCounter}.png', clip: { x: ${options.x}, y: ${options.y} } })` })
     } else {
       block = new Block(this._frameId, { type: pptrActions.SCREENSHOT, value: `await ${this._frame}.screenshot({ path: 'screenshot_${this._screenshotCounter}.png' })` })
     }
